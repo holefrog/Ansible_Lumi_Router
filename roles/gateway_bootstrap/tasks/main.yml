@@ -1,4 +1,8 @@
 ---
+- name: 打印即将设置的新密码
+  ansible.builtin.debug:
+    msg: "准备将 root 密码设置为: {{ new_root_password | default('') }}"
+
 - name: 备份原有的 network 配置文件
   ansible.builtin.raw: cp -f /etc/config/network /etc/config/network.bak
   failed_when: false
@@ -20,12 +24,8 @@
     EOF_WIRELESS
 
 - name: 设置 root 用户密码
-  ansible.builtin.raw: |
-    cat << 'EOF_PASS' | passwd root
-    {{ ansible_ssh_pass | default('uHqZ3P9k') }}
-    {{ ansible_ssh_pass | default('uHqZ3P9k') }}
-    EOF_PASS
+  ansible.builtin.raw: printf "%s\n%s\n" {{ new_root_password | default('') | quote }} {{ new_root_password | default('') | quote }} | passwd root
 
-- name: 重启设备以使网络和无线配置生效
-  ansible.builtin.raw: reboot
+- name: 同步配置并重启设备
+  ansible.builtin.raw: sync && reboot
   failed_when: false
