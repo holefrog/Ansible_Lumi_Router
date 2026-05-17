@@ -1,4 +1,6 @@
 - name: Check System Services Status
+  hosts: all
+  gather_facts: false
   tasks:
     - name: Check Services
       ansible.builtin.raw: |
