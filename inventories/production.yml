@@ -1,7 +1,7 @@
 all:
   vars:
     ansible_ssh_user: root
-    ansible_ssh_pass: "uHqZ3P9k"
+    ansible_ssh_pass: "*8^6#3Ab"
     ansible_port: 22
   hosts:
     floor1_hub:
