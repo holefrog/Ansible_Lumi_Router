@@ -7,7 +7,7 @@
 "mqtt_retain": true,
 "auto_discovery": false,
 "topic": "lumi/{device_id}/",
-"device_id": "0x{{ ansible_default_ipv4.mac | replace(':', '') | lower }}_audio",
+"device_id": "0x{{ (ansible_default_ipv4.macaddress | default(ansible_macaddress)) | replace(':', '') | lower }}_audio",
 "connect_retries": 10,
 "log_level": 3,
 "readinterval": 1,

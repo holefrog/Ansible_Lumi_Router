@@ -10,12 +10,6 @@
   command: /etc/init.d/lumimqtt restart
   when: lumi_cfg.changed
 
-- name: 检查 C 语言音频端状态是否已被完全隔离过
-  command: grep -q "_audio" /etc/lumimqttd.json
-  register: audio_isolate_check
-  failed_when: false
-  changed_when: false
-
 - name: 发放底层剧毒缓存阻断配置：物理隔离 C 语言端状态频道
   template:
     src: lumimqttd.json.j2
@@ -23,7 +17,19 @@
     owner: root
     group: root
     mode: '0644'
+  register: audio_cfg
 
 - name: 强行重载音频端守护进程
   command: /etc/init.d/lumimqttd restart
-  when: sed_action.changed
+  when: audio_cfg.changed
+
+- name: 控制端自动洗净 HA MQTT 历史残留毒素（清除 Retain 消息）
+  ansible.builtin.command: >
+    mosquitto_pub -h "{{ mqtt_host }}" -p 1883 -u "{{ mqtt_user }}" -P "{{ mqtt_pass }}" -t "{{ item }}" -r -n
+  delegate_to: localhost
+  become: false
+  when: audio_cfg.changed
+  changed_when: false
+  with_items:
+    - "homeassistant/light/0x{{ (ansible_default_ipv4.macaddress | default(ansible_macaddress)) | replace(':', '') | lower }}/config"
+    - "lumi/0x{{ (ansible_default_ipv4.macaddress | default(ansible_macaddress)) | replace(':', '') | lower }}/status"
