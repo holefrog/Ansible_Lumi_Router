@@ -1,30 +1,32 @@
 - name: Check System Services Status
-  ansible.builtin.raw: |
-    if /etc/init.d/{{ item.name }} running; then
-      PID=$(ps w | grep '[{{ item.proc[0] }}]{{ item.proc[1:] }}' | awk 'NR==1{print $1}')
-      if [ -n "$PID" ]; then
-        METRICS=$(top -n 1 2>/dev/null | awk -v pid="$PID" '$1 == pid {print "CPU: "$7", MEM: "$6}')
-        [ -n "$METRICS" ] && echo "active ($METRICS)" || echo "active (PID: $PID)"
-      else
-        echo "active"
-      fi
-    else
-      echo "inactive"
-    fi
-  loop:
-    - { name: squeezelite,        proc: squeezelite }
-    - { name: lumimqtt,           proc: lumimqtt }
-    - { name: lumimqttd,          proc: lumimqttd }
-    - { name: lumi_volume_bridge, proc: lumi_volume_bridge.py }
-    - { name: wan_watchdog,       proc: wan_watchdog.sh }
-  register: system_status
-  ignore_errors: yes
-  changed_when: false
+  tasks:
+    - name: Check Services
+      ansible.builtin.raw: |
+        if /etc/init.d/{{ item.name }} running; then
+          PID=$(ps w | grep '[{{ item.proc[0] }}]{{ item.proc[1:] }}' | awk 'NR==1{print $1}')
+          if [ -n "$PID" ]; then
+            METRICS=$(top -n 1 2>/dev/null | awk -v pid="$PID" '$1 == pid {print "CPU: "$7", MEM: "$6}')
+            [ -n "$METRICS" ] && echo "active ($METRICS)" || echo "active (PID: $PID)"
+          else
+            echo "active"
+          fi
+        else
+          echo "inactive"
+        fi
+      loop:
+        - { name: squeezelite,        proc: squeezelite }
+        - { name: lumimqtt,           proc: lumimqtt }
+        - { name: lumimqttd,          proc: lumimqttd }
+        - { name: lumi_volume_bridge, proc: lumi_volume_bridge.py }
+        - { name: wan_watchdog,       proc: wan_watchdog.sh }
+      register: system_status
+      ignore_errors: yes
+      changed_when: false
 
-- name: Report Services Status
-  ansible.builtin.debug:
-    msg: |
-      ===== SYSTEM SERVICES =====
-      {% for res in system_status.results %}
-      {{ '%-25s' | format(res.item.name) }}: {{ res.stdout | default('unknown') | trim }}
-      {% endfor %}
+    - name: Report Services Status
+      ansible.builtin.debug:
+        msg: |
+          ===== SYSTEM SERVICES =====
+          {% for res in system_status.results %}
+          {{ '%-25s' | format(res.item.name) }}: {{ res.stdout | default('unknown') | trim }}
+          {% endfor %}

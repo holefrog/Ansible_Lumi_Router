@@ -18,10 +18,14 @@
   changed_when: false
   failed_when: false
 
+- name: 安装 mosquitto-client（排毒工具，按需就地安装）
+  command: opkg install mosquitto-client
+  when: mosquitto_pub_check.rc != 0
+
 - name: 控制端自动洗净 HA MQTT 历史残留毒素（清除 Retain 消息）
   ansible.builtin.command: >
     mosquitto_pub -h "{{ mqtt_host }}" -p 1883 -u "{{ mqtt_user }}" -P "{{ mqtt_pass }}" -t "{{ item }}" -r -n
-  when: audio_cfg.changed and mosquitto_pub_check.rc == 0
+  when: audio_cfg.changed
   changed_when: false
   with_items:
     - "homeassistant/light/0x{{ hub_mac }}/config"

@@ -8,13 +8,13 @@
 - name: 刷入 JN5169 芯片固件（防重刷幂等控制）
   command: jnflash /tmp/LumiRouter.bin
   args:
-    creates: /var/log/jnflash_completed.log
+    creates: /etc/jnflash_completed
   register: jnflash_result
   failed_when: jnflash_result.rc is defined and jnflash_result.rc != 0
 
 - name: 记录刷写完成状态钢印
   file:
-    path: /var/log/jnflash_completed.log
+    path: /etc/jnflash_completed
     state: touch
   when: jnflash_result.changed
 

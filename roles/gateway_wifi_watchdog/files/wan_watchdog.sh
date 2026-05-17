@@ -13,6 +13,7 @@ ap_up() {
     uci set wireless.radio1.disabled='0'
     uci commit wireless
     wifi up radio1
+    sleep 3
     ap_active=1
     logger -t wan_watchdog "WAN down, AP enabled"
 }
@@ -21,6 +22,7 @@ ap_down() {
     uci set wireless.radio1.disabled='1'
     uci commit wireless
     wifi down radio1
+    sleep 3
     ap_active=0
     logger -t wan_watchdog "WAN restored, AP disabled"
 }
