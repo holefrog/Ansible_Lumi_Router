@@ -10,6 +10,7 @@
   args:
     creates: /var/log/jnflash_completed.log
   register: jnflash_result
+  failed_when: jnflash_result.rc is defined and jnflash_result.rc != 0
 
 - name: 记录刷写完成状态钢印
   file:

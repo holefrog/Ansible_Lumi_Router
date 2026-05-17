@@ -15,7 +15,7 @@ MQTT_PASS = "mqtt-user"
 
 def get_dynamic_device_id():
     """动态捕获 OpenWrt 当前网卡的真实物理 MAC 地址，实现多机自适应且零配置污染"""
-    for iface in ['wlan0', 'wlan0-1', 'eth0', 'br-lan']:
+    for iface in ['phy0-sta0', 'wlan0', 'wlan0-1', 'eth0', 'br-lan']:
         path = f"/sys/class/net/{iface}/address"
         if os.path.exists(path):
             with open(path, "r") as f:

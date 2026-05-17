@@ -10,5 +10,6 @@
     - lumimqttd
     - python3-paho-mqtt
     - python3-idna
+    - python3-codecs
   register: opkg_res
   changed_when: "'Configuring' in opkg_res.stdout"
