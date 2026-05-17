@@ -5,10 +5,10 @@ all:
     ansible_port: 22
   hosts:
     floor1_hub:
-      ansible_host: 192.168.50.234
+      ansible_host: 192.168.50.101
       hub_name: "Lumi Router Floor 1"
       squeezelite_name: "LumiRouter_F1"
     floor2_hub:
-      ansible_host: 192.168.50.151
+      ansible_host: 192.168.50.201
       hub_name: "Lumi Router Floor 2"
       squeezelite_name: "LumiRouter_F2"
