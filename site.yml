@@ -4,14 +4,14 @@
   gather_facts: false
   pre_tasks:
     - name: 盲灌 OpenWrt 运行 Ansible 所必需的最精简 Python 依赖链
-      raw: |
-        opkg update && opkg install \
-          python3-light \
-          python3-decimal \
-          python3-codecs \
-          python3-logging \
-          python3-multiprocessing \
-          python3-urllib
+      raw: >-
+        opkg update > /dev/null 2>&1 && opkg install
+        python3-light
+        python3-decimal
+        python3-codecs
+        python3-logging
+        python3-multiprocessing
+        python3-urllib > /dev/null 2>&1
       changed_when: false
 
     - name: 显式激活 Facts 收集（此时 Python 环境已就绪）
