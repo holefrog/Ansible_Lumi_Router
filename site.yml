@@ -3,18 +3,19 @@
   hosts: all
   gather_facts: false
   pre_tasks:
-    - name: 盲灌 OpenWrt 运行 Ansible 所必需的最精简 Python 依赖链
-      raw: >-
-        opkg update > /dev/null 2>&1 && opkg install
-        python3-light
-        python3-decimal
-        python3-codecs
-        python3-logging
-        python3-multiprocessing
-        python3-urllib > /dev/null 2>&1
-      changed_when: false
+    - name: 更新 OpenWrt 软件源
+      raw: opkg update
 
-    - name: 显式激活 Facts 收集（此时 Python 环境已就绪）
+    - name: 盲灌 OpenWrt 运行 Ansible 所必需的 Python 依赖 (当前进度: {{ item }})
+      raw: "opkg install {{ item }}"
+      loop:
+        - python3-light
+        - python3-decimal
+        - python3-codecs
+        - python3-logging
+        - python3-multiprocessing
+
+    - name: 激活 Facts 收集（此时 Python 环境已就绪）
       setup:
   roles:
     - gateway_base
