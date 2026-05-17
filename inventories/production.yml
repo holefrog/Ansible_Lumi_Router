@@ -1,8 +1,9 @@
 all:
   vars:
     ansible_ssh_user: root
-    ansible_ssh_pass: "*8^6#3Ab"  # 两台 HUB 相同的 Root 密码
+    ansible_ssh_pass: "uHqZ3P9k"  # 临时使用默认Root密码
     ansible_port: 22
+    ansible_python_interpreter: /usr/bin/python3
   hosts:
     floor1_hub:
       ansible_host: 192.168.50.234

@@ -2,6 +2,10 @@
 - name: 批量部署绿米一代网关全功能一体化解耦架构
   hosts: all
   gather_facts: false  # OpenWrt 缺少标准 Python 事实组件，关闭以加速引导
+  pre_tasks:
+    - name: Ensure Python is installed for Ansible to work
+      raw: opkg update && opkg install python3
+      changed_when: false
   roles:
     - gateway_base
     - gateway_zigbee
