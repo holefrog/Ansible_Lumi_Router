@@ -11,6 +11,5 @@
     - python3-paho-mqtt
     - python3-codecs
     - python3-idna
-    - squeezelite
   register: opkg_res
   changed_when: "'Configuring' in opkg_res.stdout"

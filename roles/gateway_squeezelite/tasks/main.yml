@@ -1,4 +1,9 @@
 ---
+- name: 安装 squeezelite 组件
+  command: "opkg install squeezelite"
+  register: opkg_res
+  changed_when: "'Configuring' in opkg_res.stdout"
+
 - name: 动态部署 Squeezelite 客户端参数
   template:
     src: squeezelite.j2
@@ -6,8 +11,14 @@
     mode: '0644'
   register: squeeze_cfg
 
-- name: 激活并重载 Squeezelite 系统服务
-  shell: |
-    /etc/init.d/squeezelite enable
-    /etc/init.d/squeezelite restart
+- name: 确保 Squeezelite 服务已启用并运行（维持基础状态，解决死锁）
+  service:
+    name: squeezelite
+    enabled: yes
+    state: started
+
+- name: 当配置变更时强制重启 Squeezelite 服务（保证幂等性）
+  service:
+    name: squeezelite
+    state: restarted
   when: squeeze_cfg.changed
