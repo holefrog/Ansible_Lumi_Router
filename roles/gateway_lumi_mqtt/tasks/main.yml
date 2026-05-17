@@ -16,16 +16,13 @@
   failed_when: false
   changed_when: false
 
-- name: 执行底层剧毒缓存阻断：物理隔离 C 语言端状态频道
-  shell: |
-    sed -i -e 's/"mqtt_host": "localhost"/"mqtt_host": "{{ mqtt_host }}"/g' \
-           -e 's/"mqtt_user": ""/"mqtt_user": "{{ mqtt_user }}"/g' \
-           -e 's/"mqtt_user_pw": ""/"mqtt_user_pw": "{{ mqtt_pass }}"/g' \
-           -e 's/"auto_discovery": true/"auto_discovery": false/g' \
-           -e 's/"device_id": "0x\([0-9a-f]\{12\}\)"/"device_id": "0x\1_audio"/g' \
-           /etc/lumimqttd.json
-  when: audio_isolate_check.rc != 0
-  register: sed_action
+- name: 发放底层剧毒缓存阻断配置：物理隔离 C 语言端状态频道
+  template:
+    src: lumimqttd.json.j2
+    dest: /etc/lumimqttd.json
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: 强行重载音频端守护进程
   command: /etc/init.d/lumimqttd restart
