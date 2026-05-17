@@ -1,0 +1,28 @@
+---
+- name: 发放底层剧毒缓存阻断配置：物理隔离 C 语言端状态频道
+  template:
+    src: lumimqttd.json.j2
+    dest: /etc/lumimqttd.json
+    owner: root
+    group: root
+    mode: '0644'
+  register: audio_cfg
+
+- name: 强行重载音频端守护进程
+  command: /etc/init.d/lumimqttd restart
+  when: audio_cfg.changed
+
+- name: 检查目标机是否已内置 mosquitto_pub 工具
+  ansible.builtin.shell: command -v mosquitto_pub
+  register: mosquitto_pub_check
+  changed_when: false
+  failed_when: false
+
+- name: 控制端自动洗净 HA MQTT 历史残留毒素（清除 Retain 消息）
+  ansible.builtin.command: >
+    mosquitto_pub -h "{{ mqtt_host }}" -p 1883 -u "{{ mqtt_user }}" -P "{{ mqtt_pass }}" -t "{{ item }}" -r -n
+  when: audio_cfg.changed and mosquitto_pub_check.rc == 0
+  changed_when: false
+  with_items:
+    - "homeassistant/light/0x{{ (ansible_default_ipv4.macaddress | default(ansible_macaddress)) | replace(':', '') | lower }}/config"
+    - "lumi/0x{{ (ansible_default_ipv4.macaddress | default(ansible_macaddress)) | replace(':', '') | lower }}/status"

@@ -1,15 +1,30 @@
 ---
-- name: 分发 WiFi 状态检测与守护脚本
-  template:
-    src: wifi_watchdog.sh.j2
-    dest: /usr/bin/wifi_watchdog.sh
+- name: 分发 WAN 状态守护脚本
+  copy:
+    src: wan_watchdog.sh
+    dest: /usr/bin/wan_watchdog.sh
     owner: root
     group: root
     mode: '0755'
+  register: watchdog_script
 
-- name: 设置定时任务定期执行 WiFi 守护检测
-  cron:
-    name: "WiFi Watchdog Service"
-    minute: "*/3"
-    job: "/usr/bin/wifi_watchdog.sh >> /tmp/wifi_watchdog.log 2>&1"
-    state: present
+- name: 分发 Procd 守护进程初始化脚本
+  copy:
+    src: wan_watchdog
+    dest: /etc/init.d/wan_watchdog
+    owner: root
+    group: root
+    mode: '0755'
+  register: watchdog_init
+
+- name: 确保 wan_watchdog 服务已启用并运行
+  service:
+    name: wan_watchdog
+    enabled: yes
+    state: started
+
+- name: 当脚本或初始化文件变更时重启服务
+  service:
+    name: wan_watchdog
+    state: restarted
+  when: watchdog_script.changed or watchdog_init.changed

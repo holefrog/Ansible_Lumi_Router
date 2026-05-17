@@ -1,0 +1,11 @@
+---
+- name: 动态渲染并分发全彩灯光端配置文件
+  template:
+    src: lumimqtt.json.j2
+    dest: /etc/lumimqtt.json
+    mode: '0644'
+  register: lumi_cfg
+
+- name: 重启 Python 灯光服务以加载新配置
+  command: /etc/init.d/lumimqtt restart
+  when: lumi_cfg.changed

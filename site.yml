@@ -22,3 +22,4 @@
     - gateway_lumi_mqtt
     - gateway_squeezelite
     - gateway_audio_bridge
+    - gateway_wifi_watchdog
