@@ -1,0 +1,7 @@
+---
+- name: 初始化网关路由器 (Bootstrap)
+  hosts: all
+  gather_facts: false
+
+  roles:
+    - gateway_bootstrap

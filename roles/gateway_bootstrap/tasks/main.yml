@@ -1,0 +1,31 @@
+---
+- name: 备份原有的 network 配置文件
+  ansible.builtin.raw: cp -f /etc/config/network /etc/config/network.bak
+  failed_when: false
+
+- name: 备份原有的 wireless 配置文件
+  ansible.builtin.raw: cp -f /etc/config/wireless /etc/config/wireless.bak
+  failed_when: false
+
+- name: 写入新的 network 配置文件 (使用 raw 模式)
+  ansible.builtin.raw: |
+    cat << 'EOF_NETWORK' > /etc/config/network
+    {{ lookup('ansible.builtin.file', 'network') }}
+    EOF_NETWORK
+
+- name: 写入新的 wireless 配置文件 (使用 raw 模式)
+  ansible.builtin.raw: |
+    cat << 'EOF_WIRELESS' > /etc/config/wireless
+    {{ lookup('ansible.builtin.file', 'wireless') }}
+    EOF_WIRELESS
+
+- name: 设置 root 用户密码
+  ansible.builtin.raw: |
+    cat << 'EOF_PASS' | passwd root
+    {{ ansible_ssh_pass | default('uHqZ3P9k') }}
+    {{ ansible_ssh_pass | default('uHqZ3P9k') }}
+    EOF_PASS
+
+- name: 重启设备以使网络和无线配置生效
+  ansible.builtin.raw: reboot
+  failed_when: false
