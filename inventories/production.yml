@@ -7,8 +7,8 @@ all:
     floor1_hub:
       ansible_host: 192.168.50.234
       hub_name: "Lumi Router Floor 1"
-      squeezelite_name: "SqueezeWrt_F1"
+      squeezelite_name: "LumiRouter_F1"
     floor2_hub:
       ansible_host: 192.168.50.151
       hub_name: "Lumi Router Floor 2"
-      squeezelite_name: "SqueezeWrt_F2"
+      squeezelite_name: "LumiRouter_F2"

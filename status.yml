@@ -1,0 +1,48 @@
+---
+- name: Check Media Player Services Status
+  hosts: all
+  gather_facts: no
+  vars:
+    # 此处替换为您实际运行用户级别服务（pipewire, squeezelite等）的用户名
+    mediaplayer_user: "pi" 
+    mediaplayer_runtime_dir: "/run/user/1000"
+
+  tasks:
+    - name: Check System Services Status
+      become: yes
+      ansible.builtin.command: "systemctl is-active {{ item }}"
+      loop:
+        - bluetooth
+        - bluetooth-a2dp-autopair
+      register: system_status
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Check User Services Status
+      become: yes
+      become_user: "{{ mediaplayer_user }}"
+      ansible.builtin.command: "systemctl --user is-active {{ item }}"
+      loop:
+        - pipewire
+        - wireplumber
+        - squeezelite
+        - shairport-sync
+        - oled
+        - volume
+      environment:
+        XDG_RUNTIME_DIR: "{{ mediaplayer_runtime_dir }}"
+      register: user_status
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Report Services Status
+      ansible.builtin.debug:
+        msg: |
+          ===== SYSTEM SERVICES =====
+          {% for res in system_status.results %}
+          {{ '%-25s' | format(res.item) }}: {{ res.stdout | default('unknown') }}
+          {% endfor %}
+          ===== USER SERVICES =====
+          {% for res in user_status.results %}
+          {{ '%-25s' | format(res.item) }}: {{ res.stdout | default('unknown') }}
+          {% endfor %}
