@@ -26,8 +26,6 @@
 - name: 控制端自动洗净 HA MQTT 历史残留毒素（清除 Retain 消息）
   ansible.builtin.command: >
     mosquitto_pub -h "{{ mqtt_host }}" -p 1883 -u "{{ mqtt_user }}" -P "{{ mqtt_pass }}" -t "{{ item }}" -r -n
-  delegate_to: localhost
-  become: false
   when: audio_cfg.changed
   changed_when: false
   with_items:
