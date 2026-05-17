@@ -1,0 +1,32 @@
+---
+- name: 动态渲染并分发全彩灯光端配置文件
+  template:
+    src: lumimqtt.json.j2
+    dest: /etc/lumimqtt.json
+    mode: '0644'
+  register: lumi_cfg
+
+- name: 重启 Python 灯光服务以加载新配置
+  command: /etc/init.d/lumimqtt restart
+  when: lumi_cfg.changed
+
+- name: 检查 C 语言音频端状态是否已被完全隔离过
+  command: grep -q "_audio" /etc/lumimqttd.json
+  register: audio_isolate_check
+  failed_when: false
+  changed_when: false
+
+- name: 执行底层剧毒缓存阻断：物理隔离 C 语言端状态频道
+  shell: |
+    sed -i -e 's/"mqtt_host": "localhost"/"mqtt_host": "{{ mqtt_host }}"/g' \
+           -e 's/"mqtt_user": ""/"mqtt_user": "{{ mqtt_user }}"/g' \
+           -e 's/"mqtt_user_pw": ""/"mqtt_user_pw": "{{ mqtt_pass }}"/g' \
+           -e 's/"auto_discovery": true/"auto_discovery": false/g' \
+           -e 's/"device_id": "0x\([0-9a-f]\{12\}\)"/"device_id": "0x\1_audio"/g' \
+           /etc/lumimqttd.json
+  when: audio_isolate_check.rc != 0
+  register: sed_action
+
+- name: 强行重载音频端守护进程
+  command: /etc/init.d/lumimqttd restart
+  when: sed_action.changed

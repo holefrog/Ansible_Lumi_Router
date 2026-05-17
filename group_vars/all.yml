@@ -1,0 +1,6 @@
+---
+mqtt_host: "192.168.50.236"  # QNAP 虚拟机 HA 的 IP
+mqtt_port: 1883
+mqtt_user: "mqtt-user"
+mqtt_pass: "mqtt-user"
+lms_host: "192.168.50.210"   # QNAP 容器 LMS 的 IP

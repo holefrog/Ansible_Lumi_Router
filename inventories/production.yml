@@ -1,0 +1,14 @@
+all:
+  vars:
+    ansible_ssh_user: root
+    ansible_ssh_pass: "*8^6#3Ab"  # 两台 HUB 相同的 Root 密码
+    ansible_port: 22
+  hosts:
+    floor1_hub:
+      ansible_host: 192.168.50.234
+      hub_name: "Lumi Router Floor 1"
+      squeezelite_name: "SqueezeWrt_F1"
+    floor2_hub:
+      ansible_host: 192.168.50.151
+      hub_name: "Lumi Router Floor 2"
+      squeezelite_name: "SqueezeWrt_F2"

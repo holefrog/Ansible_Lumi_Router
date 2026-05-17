@@ -1,0 +1,22 @@
+---
+- name: 远程拉取社区优化版 LumiRouter.bin 固件
+  get_url:
+    url: "http://example.com/LumiRouter.bin" # TODO: 请替换为实际的下载地址
+    dest: "/tmp/LumiRouter.bin"
+    mode: '0644'
+
+- name: 刷入 JN5169 芯片固件（防重刷幂等控制）
+  command: jnflash /tmp/LumiRouter.bin
+  args:
+    creates: /var/log/jnflash_completed.log
+  register: jnflash_result
+
+- name: 记录刷写完成状态钢印
+  file:
+    path: /var/log/jnflash_completed.log
+    state: touch
+  when: jnflash_result.changed
+
+- name: 物理清空 PDM 缓存
+  command: jntool erase_pdm
+  when: jnflash_result.changed

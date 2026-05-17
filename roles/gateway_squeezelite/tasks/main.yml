@@ -1,0 +1,13 @@
+---
+- name: 动态部署 Squeezelite 客户端参数
+  template:
+    src: squeezelite.j2
+    dest: /etc/config/squeezelite
+    mode: '0644'
+  register: squeeze_cfg
+
+- name: 激活并重载 Squeezelite 系统服务
+  shell: |
+    /etc/init.d/squeezelite enable
+    /etc/init.d/squeezelite restart
+  when: squeeze_cfg.changed

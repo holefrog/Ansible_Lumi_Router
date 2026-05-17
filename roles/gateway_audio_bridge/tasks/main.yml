@@ -1,0 +1,20 @@
+---
+- name: 投递核心音量自适应桥接 Python 脚本
+  copy:
+    src: lumi_volume_bridge.py
+    dest: /usr/bin/lumi_volume_bridge.py
+    mode: '0755'
+  register: py_script
+
+- name: 投递系统级 Procd 守护进程初始化脚本
+  copy:
+    src: lumi_volume_bridge
+    dest: /etc/init.d/lumi_volume_bridge
+    mode: '0755'
+  register: init_script
+
+- name: 强制实现服务闭环状态：全量开启自启并拉起后台守护进程
+  shell: |
+    /etc/init.d/lumi_volume_bridge enable
+    /etc/init.d/lumi_volume_bridge restart
+  when: py_script.changed or init_script.changed

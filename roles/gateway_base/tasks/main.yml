@@ -1,0 +1,16 @@
+---
+- name: 刷新 OpenWrt 包管理器本地缓存索引
+  command: opkg update
+  changed_when: false
+
+- name: 集中收拢并批量灌入依赖包（避免各 Role 越位冲突）
+  command: "opkg install {{ item }}"
+  loop:
+    - lumimqtt
+    - lumimqttd
+    - python3-paho-mqtt
+    - python3-codecs
+    - python3-idna
+    - squeezelite
+  register: opkg_res
+  changed_when: "'Configuring' in opkg_res.stdout"
