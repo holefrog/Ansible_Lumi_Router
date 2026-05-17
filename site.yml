@@ -1,7 +1,7 @@
 ---
 - name: 批量部署绿米一代网关全功能一体化解耦架构
   hosts: all
-  gather_facts: false  # OpenWrt 缺少标准 Python 事实组件，关闭以加速引导
+  gather_facts: false
   pre_tasks:
     - name: 盲灌 OpenWrt 运行 Ansible 所必需的最精简 Python 依赖链
       raw: |
