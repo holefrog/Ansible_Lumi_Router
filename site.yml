@@ -6,7 +6,7 @@
     - name: 更新 OpenWrt 软件源
       raw: opkg update
 
-    - name: 盲灌 OpenWrt 运行 Ansible 所必需的 Python 依赖 (当前进度: {{ item }})
+    - name: 盲灌 OpenWrt 运行 Ansible 所必需的 Python 依赖
       raw: "opkg install {{ item }}"
       loop:
         - python3-light
