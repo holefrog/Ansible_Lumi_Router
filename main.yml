@@ -1,0 +1,15 @@
+---
+- name: 分发 WiFi 状态检测与守护脚本
+  template:
+    src: wifi_watchdog.sh.j2
+    dest: /usr/bin/wifi_watchdog.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: 设置定时任务定期执行 WiFi 守护检测
+  cron:
+    name: "WiFi Watchdog Service"
+    minute: "*/3"
+    job: "/usr/bin/wifi_watchdog.sh >> /tmp/wifi_watchdog.log 2>&1"
+    state: present

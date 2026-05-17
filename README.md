@@ -2,6 +2,24 @@
 
 本指南适用于将绿米网关 **ZHWG11LM (Aqara Hub)** 彻底解锁，空中刷入 OpenWrt 系统，将板载 JN5169 芯片配置为通用的 Zigbee Router（中继器），并最终通过 MQTT 将网关原厂硬件（RGB夜灯、物理按键、光照传感器、音量调音台与喇叭）全面桥接融入 Home Assistant 智能家居生态。
 
+
+是的，就是网关顶部的那个物理大按键。
+在刷了 OpenWrt（OpenLumi 固件）的绿米 HUB 上，物理按键已经被重新映射。你不需要进 SSH 输入命令，直接在设备通电开机完成的状态下，根据长按时间的不同，可以触发两种不同程度的复位动作：
+1. 长按 10 秒（网络救援模式）
+灯光表现：闪烁黄灯 3 次。
+
+效果：系统会重置当前的无线网络配置，并强制重新释放自带的 OpenWrt AP 救援热点。
+
+适用场景：当你配错 Wi-Fi 连不上主路由，或者导致失联，但又不想擦除其他自己安装的插件或脚本时使用。
+
+2. 长按 20 秒（彻底硬件复位 / 相当于 firstboot）
+灯光表现：闪烁红灯 3 次。
+
+效果：系统会彻底擦除 overlay 分区中的所有用户修改、密码、安装的包和自定义配置文件，完全恢复到你刚刷完 OpenWrt 时的最干净初始状态。
+
+适用场景：系统彻底改烂了，或者希望完全重新开始。
+    
+
 ---
 
 ## 目录
@@ -200,34 +218,103 @@ ssh: connect to host rsa port 22: Connection refused
 #### 【方法二：手动修改无线配置文件（纯命令行/百分之百成功/强烈推荐 🌟）】
 无需通过网页点选，在网关本地的串口或通过连接初始 OpenWrt 热点后 SSH 登录，直接手动修改底层的无线配置文件，强行固定为 STA 纯客户端接入。
 
+1. **登录**
+``` 
+ssh -o HostKeyAlgorithms=+ssh-rsa root@192.168.1.1
+```
+ 
 1. **修改配置文件 `/etc/config/wireless`：**
-   执行命令 `vi /etc/config/wireless`，将其内部的无线接口彻底重写为如下纯 Station 结构：
-   ```text
-   config wifi-device 'radio0'
-       option type 'mac80211'
-       option channel 'auto'
-       option hwmode '11g'
+```
+mv /etc/config/wireless /etc/config/wireless.bak
+vi /etc/config/wireless
+```
 
-   config wifi-iface 'default_radio0'
-       option device 'radio0'
-       option network 'lan'
-       option mode 'sta'
-       option ssid '你家主路由的2.4G无线名称'
-       option encryption 'psk2'
-       option key '你家无线的密码'
-   ```
+将其内部的无线接口彻底重写为如下纯 Station 结构：
+
+```
+config wifi-device 'radio0'
+	option type 'mac80211'
+	option path 'platform/soc/2100000.bus/2190000.mmc/mmc_host/mmc0/mmc0:0001/mmc0:0001:1'
+	option band '2g'
+	option channel 'auto'
+	option htmode 'NOHT'
+
+config wifi-iface 'router_client'
+	option device 'radio0'
+	option network 'wan'
+	option mode 'sta'
+	option ssid '5300'
+	option encryption 'psk2'
+	option key 'David@Home'
+
+config wifi-device 'radio1'
+	option type 'mac80211'
+	option path 'platform/soc/2100000.bus/2190000.mmc/mmc_host/mmc0/mmc0:0001/mmc0:0001:1+1'
+	option band '2g'
+	option channel '1'
+	option htmode 'NOHT'
+	option disabled '0'
+
+config wifi-iface 'default_radio1'
+	option device 'radio1'
+	option network 'lan'
+	option mode 'ap'
+	option ssid 'OpenWrt'
+	option encryption 'none'
+```
+
+1. **修改配置文件 `/etc/config/network`：**
+```
+mv /etc/config/network /etc/config/network.bak
+vi /etc/config/network
+```
+内容：
+```
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option ula_prefix 'fdcf:beab:72ff::/48'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	option ports 'wlan0'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '192.168.1.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+
+config interface 'wan'
+	option device 'wlan1'
+	option proto 'dhcp'
+
+config interface 'wan6'
+	option device 'wlan1'
+	option proto 'dhcpv6'
+
+config interface 'wwan'
+	option proto 'dhcp'
+```
+
+
 2. **重载网络服务使其生效：**
-   在终端执行以下命令重新初始化网络堆栈与无线配置：
-   ```bash
-   /etc/init.d/network restart
-   wifi reload
-   ```
+在终端执行以下命令重新初始化网络堆栈与无线配置：
+```
+/etc/init.d/network restart && wifi reload
+```
 
 ### 4.3 获取新分配的局域网 IP
 此时，网关将断开与你电脑的直连。请登录你家主路由的后台，查看到网关被分配的新局域网 IP（名称显示为 OpenWrt）。
 * *已知分配设备 IP 参考：*
-  * **Aqara_Hub-1**: `192.168.50.234`
-  * **Aqara_Hub-2**: `192.168.50.151`
+* **Aqara_Hub-1**: `192.168.50.234`
+* **Aqara_Hub-2**: `192.168.50.151`
 
 ---
 
@@ -276,7 +363,11 @@ jntool erase_pdm
 ## 第七部分：恢复纯净 OpenWrt 出厂默认状态
 
 如果你在配置网络或无线时失误导致断联，可以直接通过 **串口（UART）控制台** 执行以下命令，将系统恢复到刚刷完机、最干净的出厂默认状态（清空所有配置、恢复默认的 OpenWrt 热点和 `192.168.1.1` 管理 IP）：
+```
+sudo picocom -b 115200 /dev/ttyUSB0
+```
 
+彻底清空你后来修改的 root 密码，并将其恢复为固件最原始的出厂默认状态（在绝大多数 OpenWrt 系统中，默认状态就是“空密码”，即没有密码。
 1. **清除所有用户修改的配置（重置 overlay 分区）：**
    ```bash
    firstboot

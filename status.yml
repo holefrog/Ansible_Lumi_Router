@@ -22,6 +22,7 @@
         - lumimqtt
         - lumimqttd
         - lumi_volume_bridge
+        - wan_watchdog
       register: system_status
       ignore_errors: yes
       changed_when: false

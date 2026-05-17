@@ -10,7 +10,8 @@
           python3-decimal \
           python3-codecs \
           python3-logging \
-          python3-multiprocessing
+          python3-multiprocessing \
+          python3-urllib
       changed_when: false
 
     - name: 显式激活 Facts 收集（此时 Python 环境已就绪）
