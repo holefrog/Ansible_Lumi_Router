@@ -668,7 +668,6 @@ inventories/
 group_vars/
   all.yml                      # 全局公用变量（MQTT、LMS IP）
 roles/
-  ├── gateway_base/            # 基础环境：公共依赖包
   ├── gateway_zigbee/          # 固件刷写：JN5169 Zigbee Router
   ├── gateway_lumi_mqtt/       # 原厂组件：lumimqtt / lumimqttd
   ├── gateway_squeezelite/     # 串流播放：LMS 客户端

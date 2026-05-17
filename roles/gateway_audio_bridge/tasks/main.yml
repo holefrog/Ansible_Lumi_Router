@@ -1,3 +1,8 @@
+- name: 安装音频桥接所需的 Python MQTT 依赖包
+  command: "opkg install python3-paho-mqtt python3-idna"
+  register: opkg_mqtt
+  changed_when: "'Configuring' in opkg_mqtt.stdout"
+
 - name: 投递核心音量自适应桥接 Python 脚本
   copy:
     src: lumi_volume_bridge.py
