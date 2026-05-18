@@ -1,4 +1,9 @@
 ---
+- name: 安装原厂灯光与音频服务组件
+  command: "opkg install lumimqtt lumimqttd"
+  register: opkg_lumi
+  changed_when: "'Configuring' in opkg_lumi.stdout"
+
 - name: 引入 lumimqtt 相关的配置与重启任务
   ansible.builtin.include_tasks: lumimqtt.yml
 

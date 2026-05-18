@@ -29,4 +29,6 @@
   changed_when: false
   with_items:
     - "homeassistant/light/0x{{ hub_mac }}/config"
+    - "homeassistant/number/0x{{ hub_mac }}_volume/config"
+    - "homeassistant/sensor/0x{{ hub_mac }}_audio/config"
     - "lumi/0x{{ hub_mac }}/status"
