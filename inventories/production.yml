@@ -8,9 +8,9 @@ all:
       ansible_host: 192.168.50.101
       hub_name: "Lumi Router Floor 1"
       squeezelite_name: "LumiRouter_F1"
-      hub_mac: "7c49eb93b068"
+      hub_mac: "7c49eb924bd7"
     floor2_hub:
       ansible_host: 192.168.50.201
       hub_name: "Lumi Router Floor 2"
       squeezelite_name: "LumiRouter_F2"
-      hub_mac: "7c49eb924bd7"
+      hub_mac: "7c49eb93b068"
