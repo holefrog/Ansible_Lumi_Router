@@ -4,21 +4,22 @@
   register: opkg_res
   changed_when: "'Configuring' in opkg_res.stdout"
 
-- name: 动态部署 Squeezelite 客户端参数
-  template:
-    src: squeezelite.j2
-    dest: /etc/config/squeezelite
-    mode: '0644'
-  register: squeeze_cfg
+- name: 动态渲染并接管极简版 Squeezelite 启动脚本 (直接注入配置与冷启守护)
+  ansible.builtin.template:
+    src: squeezelite.init.j2
+    dest: /etc/init.d/squeezelite
+    mode: '0755'
+    owner: root
+    group: root
+  register: squeeze_init
 
-- name: 确保 Squeezelite 服务已启用并运行（维持基础状态，解决死锁）
+- name: 清理废弃的 UCI 配置文件 (已全面转为 init 脚本硬编码直出)
+  ansible.builtin.file:
+    path: /etc/config/squeezelite
+    state: absent
+
+- name: 确保 Squeezelite 服务已启用并应用最新配置
   service:
     name: squeezelite
     enabled: yes
-    state: started
-
-- name: 当配置变更时强制重启 Squeezelite 服务（保证幂等性）
-  service:
-    name: squeezelite
-    state: restarted
-  when: squeeze_cfg.changed
+    state: "{{ 'restarted' if squeeze_init.changed else 'started' }}"

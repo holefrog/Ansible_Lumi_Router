@@ -5,3 +5,8 @@ mqtt_user: "mqtt-user"
 mqtt_pass: "mqtt-user"
 lms_host: "192.168.50.210"   # QNAP 容器 LMS 的 IP
 new_root_password: "*8^6#3Ab" # 初始刷机后为网关设置的新 root 密码
+
+squeezelite_alsa_buffer: "40"
+squeezelite_alsa_period: "4"
+squeezelite_alsa_format: "32"
+squeezelite_alsa_mmap: "1"
