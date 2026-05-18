@@ -5,6 +5,7 @@
   pre_tasks:
     - name: 更新 OpenWrt 软件源
       raw: opkg update
+      tags: always
 
     - name: 盲灌 OpenWrt 运行 Ansible 所必需的 Python 依赖
       raw: "opkg install {{ item }}"
@@ -15,15 +16,23 @@
         - python3-logging
         - python3-multiprocessing
         - python3-urllib
+      tags: always
 
     - name: 激活 Facts 收集（此时 Python 环境已就绪）
       setup:
+      tags: always
+
   roles:
-    - gateway_zigbee
-    - gateway_lumi_mqtt
-    - gateway_squeezelite
-    - gateway_audio_bridge
-    - gateway_wifi_watchdog
+    - role: gateway_zigbee
+      tags: ['zigbee']
+    - role: gateway_lumi_mqtt
+      tags: ['mqtt']
+    - role: gateway_squeezelite
+      tags: ['squeezelite', 'audio']
+    - role: gateway_audio_bridge
+      tags: ['audio_bridge', 'audio']
+    - role: gateway_wifi_watchdog
+      tags: ['watchdog', 'wifi']
 
   post_tasks:
     - name: 全量部署完成，提示必须手动断电重启
@@ -35,3 +44,4 @@
           👉 请现在立刻【手动拔掉网关的电源插头】，然后再【重新插上】！
           只有彻底断电硬重启，Zigbee 芯片才会正常进入配网模式！
           =======================================================
+      tags: always
