@@ -3,28 +3,18 @@ import json
 import subprocess
 import time
 import re
-import os
 import paho.mqtt.client as mqtt
 
 # ==================== 核心配置区域 ====================
-MQTT_HOST = "192.168.50.236"
-MQTT_PORT = 1883
-MQTT_USER = "mqtt-user"
-MQTT_PASS = "mqtt-user"
+# 直接由 Ansible 全局变量注入，消除硬编码维护成本
+MQTT_HOST = "{{ mqtt_host }}"
+MQTT_PORT = {{ mqtt_port }}
+MQTT_USER = "{{ mqtt_user }}"
+MQTT_PASS = "{{ mqtt_pass }}"
 # ======================================================
 
-def get_dynamic_device_id():
-    """动态捕获 OpenWrt 当前网卡的真实物理 MAC 地址，实现多机自适应且零配置污染"""
-    for iface in ['phy0-sta0', 'wlan0', 'wlan0-1', 'eth0', 'br-lan']:
-        path = f"/sys/class/net/{iface}/address"
-        if os.path.exists(path):
-            with open(path, "r") as f:
-                mac = f.read().strip().replace(":", "").lower()
-                if mac:
-                    return f"0x{mac}"
-    return "0x7c49eb93b068"  # 终极保底兜底
-
-DEVICE_ID = get_dynamic_device_id()
+# 彻底解耦：直接使用 Ansible 下发的确定性 MAC 地址，无惧冷启动网络风暴
+DEVICE_ID = "0x{{ hub_mac }}"
 
 TOPIC_SNAP_SET = f"lumi/{DEVICE_ID}/volumesnap/set"
 TOPIC_SNAP_STATE = f"lumi/{DEVICE_ID}/volumesnap/state"
