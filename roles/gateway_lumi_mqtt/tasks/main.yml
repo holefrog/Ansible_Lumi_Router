@@ -10,12 +10,13 @@
     state: directory
     mode: '0755'
 
-- name: 复制 files 目录下的所有 MP3 文件到 /music 目录
+- name: 复制 files 目录下的所有音频文件到 /music 目录
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /music/
   with_fileglob:
     - "*.mp3"
+    - "*.wav"
 
 - name: 引入 lumimqtt 相关的配置与重启任务
   ansible.builtin.include_tasks: lumimqtt.yml

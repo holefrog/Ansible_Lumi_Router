@@ -11,6 +11,7 @@
   "legacy_color_mode": false,
   "light_transition_period": 1.0,
   "custom_commands": {
-    "playmp3": "sh -c 'mpg123 -q /music/${1:-alarm.mp3}' _"
+    "playmp3": "sh -c 'mpg123 -q /music/${1:-alarm.mp3}' _",
+    "playwav": "sh -c 'aplay -q /music/${1:-alarm.wav}' _"
   }
 }
