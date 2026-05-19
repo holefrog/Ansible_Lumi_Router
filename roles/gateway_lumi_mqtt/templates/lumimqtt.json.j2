@@ -11,8 +11,8 @@
   "legacy_color_mode": false,
   "light_transition_period": 1.0,
   "custom_commands": {
-    "playmp3": "sh -c 'mpg123 /music/${1:-alarm.mp3} > /tmp/mqtt_audio.log 2>&1' _",
-    "playwav": "sh -c 'aplay /music/${1:-alarm.wav} > /tmp/mqtt_audio.log 2>&1' _",
-    "set_vol": "sh -c 'amixer set Playback ${1:-100}%' _"
+    "playmp3": "sh -c '/usr/bin/mpg123 /music/${1:-alarm.mp3} > /tmp/tmp_audio.log 2>&1' _",
+    "playwav": "sh -c '/usr/bin/aplay /music/${1:-alarm.wav} > /tmp/tmp_audio.log 2>&1' _",
+    "set_vol": "sh -c '/usr/bin/amixer set Master ${1:-100}%' _"
   }
 }
