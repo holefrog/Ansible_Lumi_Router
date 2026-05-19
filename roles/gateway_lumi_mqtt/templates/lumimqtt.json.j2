@@ -9,5 +9,8 @@
   "sensor_threshold": 50,
   "sensor_debounce_period": 60,
   "legacy_color_mode": false,
-  "light_transition_period": 1.0
+  "light_transition_period": 1.0,
+  "custom_commands": {
+    "playmp3": "sh -c 'mpg123 -q /music/${1:-alarm.mp3}' _"
+  }
 }

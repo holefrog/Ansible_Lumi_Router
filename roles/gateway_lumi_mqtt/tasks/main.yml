@@ -1,8 +1,21 @@
 ---
 - name: 安装原厂灯光与音频服务组件
-  command: "opkg install lumimqtt lumimqttd"
+  command: "opkg install lumimqtt lumimqttd mpg123"
   register: opkg_lumi
   changed_when: "'Configuring' in opkg_lumi.stdout"
+
+- name: 确保网关上存在 /music 目录
+  ansible.builtin.file:
+    path: /music
+    state: directory
+    mode: '0755'
+
+- name: 复制 files 目录下的所有 MP3 文件到 /music 目录
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /music/
+  with_fileglob:
+    - "*.mp3"
 
 - name: 引入 lumimqtt 相关的配置与重启任务
   ansible.builtin.include_tasks: lumimqtt.yml
