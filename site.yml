@@ -26,7 +26,7 @@
     - role: gateway_zigbee
       tags: ['zigbee']
     - role: gateway_lumi_mqtt
-      tags: ['mqtt']
+      tags: ['mqtt', 'audio']
     - role: gateway_audio_bridge
       tags: ['audio_bridge', 'audio']
     - role: gateway_wifi_watchdog
