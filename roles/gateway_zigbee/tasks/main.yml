@@ -1,9 +1,8 @@
 ---
 - name: 远程拉取社区优化版 LumiRouter.bin 固件
-  get_url:
-    url: "https://github.com/igorlistopad/Lumi-Router-JN5169/releases/download/2021.3.20/LumiRouter.bin"
-    dest: "/tmp/LumiRouter.bin"
-    mode: '0644'
+  command: wget https://github.com/igorlistopad/Lumi-Router-JN5169/releases/download/2021.3.20/LumiRouter.bin -O /tmp/LumiRouter.bin
+  args:
+    creates: /etc/jnflash_completed
 
 - name: 刷入 JN5169 芯片固件（防重刷幂等控制）
   command: jnflash /tmp/LumiRouter.bin
