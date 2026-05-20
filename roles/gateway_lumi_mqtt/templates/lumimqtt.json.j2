@@ -13,6 +13,7 @@
   "custom_commands": {
     "playmp3": "/usr/bin/mpg123 /music/{file} > /tmp/tmp_audio.log 2>&1",
     "playwav": "/usr/bin/aplay /music/{file} > /tmp/tmp_audio.log 2>&1",
-    "set_vol": "/usr/bin/amixer set Master {vol}% > /tmp/tmp_audio.log 2>&1"
-}
+    "set_vol": "/usr/bin/amixer set Master {vol}% > /tmp/tmp_audio.log 2>&1",
+    "stopplay": "killall mpg123 2>/dev/null; killall aplay 2>/dev/null; true"
+  }
 }

@@ -701,3 +701,11 @@ roles/
 |----------|----------|------|
 | **10 秒** | 黄灯闪烁 3 次 | 重置无线网络配置，重新释放 OpenWrt AP 救援热点 |
 | **20 秒** | 红灯闪烁 3 次 | 彻底擦除 overlay 分区，恢复刷机后最干净初始状态 |
+
+
+
+## MQTT 调试
+在Lumi Router上运行：
+```bash
+mosquitto_sub -h 192.168.50.236 -p 1883 -u "mqtt-user" -P "mqtt-user" -t "lumi/#" -v
+```
