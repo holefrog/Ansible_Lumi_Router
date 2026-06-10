@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# apply.sh 仅用于正常生产环境部署/更新。
+# - Use bootstrap.sh for fresh OpenWrt initialization on 192.168.1.1.
+# - Use apply.sh for site.yml/status.yml deployments using inventories/production.yml.
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
