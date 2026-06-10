@@ -690,7 +690,10 @@ lms_host: "192.168.50.210"   # QNAP 容器 LMS 的 IP
 site.yml                       # 总入口 Playbook
 status.yml                     # 服务状态检查 Playbook
 apply.sh                       # 交互式执行入口脚本
+bootstrap.sh                   # 初始 OpenWrt 引导部署脚本
 ansible.cfg                    # Ansible 全局配置
+templates/
+  wireless.j2                 # 公共无线配置模板，bootstrap 与 apply 复用
 inventories/
   production.yml               # 资产清单（物理 IP 等）
 group_vars/

@@ -17,11 +17,13 @@
     {{ lookup('ansible.builtin.file', 'network') }}
     EOF_NETWORK
 
-- name: 写入新的 wireless 配置文件 (使用 raw 模式)
-  ansible.builtin.raw: |
-    cat << 'EOF_WIRELESS' > /etc/config/wireless
-    {{ lookup('ansible.builtin.file', 'wireless') }}
-    EOF_WIRELESS
+- name: 写入新的 wireless 配置文件
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/templates/wireless.j2"
+    dest: /etc/config/wireless
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: 设置 root 用户密码
   ansible.builtin.raw: printf "%s\n%s\n" {{ new_root_password | default('') | quote }} {{ new_root_password | default('') | quote }} | passwd root

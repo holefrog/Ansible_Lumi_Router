@@ -1,7 +1,7 @@
 ---
 - name: Deploy wireless config
   ansible.builtin.template:
-    src: wireless.j2
+    src: "{{ playbook_dir }}/templates/wireless.j2"
     dest: /etc/config/wireless
     owner: root
     group: root
