@@ -13,9 +13,10 @@
 - [第五部分：刷写 JN5169 芯片为 Zigbee Router 模式](#第五部分刷写-jn5169-芯片为-zigbee-router-模式)
 - [第六部分：接入智能家居平台 (ZHA / Zigbee2MQTT)](#第六部分接入智能家居平台-zha--zigbee2mqtt)
 - [第七部分：恢复纯净 OpenWrt 出厂默认状态](#第七部分恢复纯净-openwrt-出厂默认状态)
-- [第八部分：全面激活并集成原有 Hub 硬件外设 (MQTT)](#第八部分全面激活并集成原有-hub-硬件外设-mqtt)
-- [第九部分：音频功能控制与进阶玩耍指南](#第九部分音频功能控制与进阶玩耍指南)
-- [第十部分：批量部署与灾备（Ansible 自动化）](#第十部分批量部署与灾备ansible-自动化)
+- [第八部分：初始化 Hub](#第八部分初始化-hub)
+- [第九部分：全面激活并集成原有 Hub 硬件外设 (MQTT)](#第九部分全面激活并集成原有-hub-硬件外设-mqtt)
+- [第十部分：音频功能控制与进阶玩耍指南](#第十部分音频功能控制与进阶玩耍指南)
+- [第十一部分：批量部署与灾备（Ansible 自动化）](#第十一部分批量部署与灾备ansible-自动化)
 - [附录：物理按键复位速查](#附录物理按键复位速查)
 
 ---
@@ -359,9 +360,36 @@ reboot
 
 ---
 
-## 第八部分：全面激活并集成原有 Hub 硬件外设 (MQTT)
+## 第八部分：初始化 Hub
 
-### 8.1 建立 Home Assistant MQTT 服务器 (Mosquitto Broker)
+当路由器恢复到 OpenWrt 出厂默认状态后，会自动开启一个默认的 Wi-Fi 热点，通常 SSID 为 `OpenWrt`。
+
+1. 先将电脑连接到该 OpenWrt Wi-Fi。
+2. 使用默认 IP `192.168.1.1` 作为目标地址。
+3. 运行 `bootstrap.sh`，它会调用 Ansible 进入该设备并执行 `bootstrap.yml`：
+
+```bash
+./bootstrap.sh
+```
+
+该脚本的实际执行命令为：
+
+```bash
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '192.168.1.1,' -u root -k bootstrap.yml
+```
+
+如果 OpenWrt SSH 初始没有密码，`ansible-playbook` 提示输入密码时直接按回车即可。
+
+**注意：**
+
+- 该流程仅用于刚恢复出厂的纯净 OpenWrt 设备。\
+- `bootstrap.sh` / `bootstrap.yml` 不应与正常的 `site.yml` apply 流程混用，避免因 IP 变化或部署场景不同而产生误解。
+
+---
+
+## 第九部分：全面激活并集成原有 Hub 硬件外设 (MQTT)
+
+### 9.1 建立 Home Assistant MQTT 服务器 (Mosquitto Broker)
 
 1. **安装插件：** HA 后台 → **设置 → 插件 → 插件商店**，搜索 `Mosquitto`，安装并开启**开机自启**与**崩溃重启**，点击**启动**。
 
@@ -511,7 +539,7 @@ Procd 守护服务位于 `roles/gateway_audio_bridge/files/lumi_volume_bridge`�
 
 ---
 
-## 第九部分：音频功能控制与进阶玩耍指南
+## 第十部分：音频功能控制与进阶玩耍指南
 
 ### 9.1 硬件双通道混音器原理
 
@@ -594,7 +622,7 @@ ps | grep squeezelite
 
 ---
 
-## 第十部分：批量部署与灾备（Ansible 自动化）
+## 第十一部分：批量部署与灾备（Ansible 自动化）
 
 ### 10.1 关键配置
 
@@ -685,7 +713,34 @@ roles/
 ./apply.sh  # 选择 2) Status
 ```
 
-### 10.5 WAN 看门狗（gateway_wifi_watchdog）
+### 10.5 `apply.sh` 与 `bootstrap.sh` 的场景区别
+
+- `bootstrap.sh`
+  - 适用于刚恢复出厂默认 OpenWrt 的设备。\
+  - 场景：路由器完成 `firstboot` / 重置后，电脑连接到 OpenWrt 默认 Wi-Fi，访问默认 IP `192.168.1.1`。\
+  - 用法：
+    ```bash
+    ./bootstrap.sh
+    ```
+  - 它实际执行：
+    ```bash
+    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '192.168.1.1,' -u root -k bootstrap.yml
+    ```
+  - 作用：初始化网络、配置 root、写入最初的 OpenWrt 配置。
+
+- `apply.sh`
+  - 适用于已经完成初次初始化、正在做正常部署或配置更新的设备。\
+  - 场景：设备已进入目标网络，可从 `inventories/production.yml` 找到正确 IP，如 `192.168.50.xxx`。\
+  - 用法：
+    ```bash
+    ./apply.sh
+    ```
+  - 选择 `1) Deploy` 执行 `site.yml`；选择 `2) Status` 执行 `status.yml`。
+  - 作用：对已联网的 Hub 进行完整部署、应用配置变化、检查服务状态。
+
+> 重要提示：不要把 `bootstrap.sh` 的 IP `192.168.1.1` 与 `apply.sh` 的生产 inventory IP 混用，两个流程对应不同部署阶段。
+
+### 10.6 WAN 看门狗（gateway_wifi_watchdog）
 
 当 WAN 侧 `phy0-sta0` 接口断线超过 **3 次检测（30 秒）** 后，自动启用 `radio1` AP 救援热点（SSID: `OpenWrt`），供本地 SSH 接入排查。WAN 恢复稳定后自动关闭 AP。
 
