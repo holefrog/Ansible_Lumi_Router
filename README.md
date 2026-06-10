@@ -382,7 +382,7 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '192.168.1.1,' -u root -k bo
 
 **注意：**
 
-- 该流程仅用于刚恢复出厂的纯净 OpenWrt 设备。\
+- 该流程仅用于刚恢复出厂的纯净 OpenWrt 设备。
 - `bootstrap.sh` / `bootstrap.yml` 不应与正常的 `site.yml` apply 流程混用，避免因 IP 变化或部署场景不同而产生误解。
 
 ---
@@ -696,6 +696,7 @@ inventories/
 group_vars/
   all.yml                      # 全局公用变量（MQTT、LMS IP）
 roles/
+  ├── gateway_network/         # 无线配置：更新 SSID/密钥并重载 Wi-Fi
   ├── gateway_zigbee/          # 固件刷写：JN5169 Zigbee Router
   ├── gateway_lumi_mqtt/       # 原厂组件：lumimqtt / lumimqttd
   ├── gateway_squeezelite/     # 串流播放：LMS 客户端
@@ -712,6 +713,8 @@ roles/
 # 检查服务状态
 ./apply.sh  # 选择 2) Status
 ```
+
+> `site.yml` 现在包含 `gateway_network`，用于将 `group_vars/all.yml` 中的 `wireless_ssid` / `wireless_key` 变更部署到设备并重载 Wi-Fi。
 
 ### 10.5 `apply.sh` 与 `bootstrap.sh` 的场景区别
 

@@ -24,6 +24,8 @@
       tags: always
 
   roles:
+    - role: gateway_network
+      tags: ['network']
     - role: gateway_zigbee
       tags: ['zigbee']
     - role: gateway_lumi_mqtt

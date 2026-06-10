@@ -1,0 +1,16 @@
+---
+- name: Deploy wireless config
+  ansible.builtin.template:
+    src: wireless.j2
+    dest: /etc/config/wireless
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload wireless
+
+- name: Ensure wireless config is committed
+  ansible.builtin.command:
+    cmd: uci commit wireless
+  when: wireless_ssid is defined
+  changed_when: false
+  check_mode: no

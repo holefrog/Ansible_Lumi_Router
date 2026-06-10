@@ -1,0 +1,6 @@
+---
+- name: Reload wireless
+  ansible.builtin.command:
+    cmd: /sbin/wifi
+  changed_when: false
+  check_mode: no
