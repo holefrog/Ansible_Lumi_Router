@@ -25,5 +25,5 @@ config wifi-iface 'default_radio1'
 	option device 'radio1'
 	option network 'lan'
 	option mode 'ap'
-	option ssid "{{ 'OpenWrt-' + (ansible_default_ipv4.macaddress | default(ansible_facts.default_ipv4.macaddress) | default('unknown') | replace(':','') | lower) }}"
+	option ssid "{{ 'OpenLumi-' + (ansible_default_ipv4.macaddress | default(ansible_facts.default_ipv4.macaddress) | default('unknown') | replace(':','') | lower) }}"
 	option encryption 'none'
